@@ -1,6 +1,8 @@
 package com.rafaelleal.android.turmasfirebaseproject.main.ui
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -41,11 +43,18 @@ class MainViewModel: ViewModel() {
                     Log.i(TAG, "document: ${document}")
                     Log.i(TAG, "turma: ${turma}")
                 }
+                setTurmas(lista)
             }
             .addOnFailureListener { exception ->
 
             }
         return lista
+    }
+
+    private val _turmas = MutableLiveData<List<Turma>>()
+    val turmas : LiveData<List<Turma>> = _turmas
+    fun setTurmas(value: List<Turma>){
+        _turmas.postValue(value)
     }
 
 

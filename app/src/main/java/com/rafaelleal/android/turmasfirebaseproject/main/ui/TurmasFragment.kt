@@ -6,16 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.rafaelleal.android.turmasfirebaseproject.R
 import com.rafaelleal.android.turmasfirebaseproject.databinding.FragmentTurmasBinding
+import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaAdapter
+import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaListener
+import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 import com.rafaelleal.android.turmasfirebaseproject.utils.nav
 import com.rafaelleal.android.turmasfirebaseproject.utils.toast
 
 class TurmasFragment : Fragment() {
 
-    val viewModel : MainViewModel by activityViewModels()
+    val viewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentTurmasBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -35,6 +40,8 @@ class TurmasFragment : Fragment() {
         setupViews()
         setupClickListeners()
         getTurmas()
+        setupRecyclerView()
+        setupObservers()
     }
 
     private fun setupClickListeners() {
@@ -53,8 +60,43 @@ class TurmasFragment : Fragment() {
     }
 
 
+    // Existe maneira melhor!!!
     fun getTurmas() {
-        val lista = viewModel.getTurmas()
-        toast("Tamanho da lista: ${lista.size}")
+        viewModel.getTurmas()
     }
+
+
+    val adapter = TurmaAdapter(
+        object : TurmaListener {
+            override fun onEditClick(turma: Turma) {
+                nav(R.id.action_turmasFragment_to_editarTurmaFragment)
+            }
+
+            override fun onDeleteClick(turma: Turma) {
+            }
+        }
+    )
+
+    private fun setupRecyclerView() {
+        // adapter precisa ser uma variável global para ser acessada por todos os métodos
+        binding.rvTurmas.adapter = adapter
+        binding.rvTurmas.layoutManager = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.VERTICAL,
+            false
+        )
+    }
+
+    private fun setupObservers(){
+        viewModel.turmas.observe(viewLifecycleOwner){
+            atualizaRecyclerView(it)
+        }
+    }
+
+    fun atualizaRecyclerView(lista: List<Turma>){
+        adapter.submitList(lista)
+        binding.rvTurmas.adapter = adapter
+    }
+
+
 }

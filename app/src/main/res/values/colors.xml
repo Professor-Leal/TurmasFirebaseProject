@@ -26,5 +26,7 @@
     <color name="yellow_20">#666600</color>
     <color name="yellow_10">#333300</color>
 
+    <color name="red">#FF0000</color>
+
 
 </resources>
