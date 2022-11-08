@@ -142,6 +142,10 @@ class MainViewModel : ViewModel() {
         )
     }
 
+    init{
+        observeColecaoTurmas()
+    }
+
 
 }
 

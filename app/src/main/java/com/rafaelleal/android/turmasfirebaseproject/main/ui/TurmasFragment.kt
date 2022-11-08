@@ -39,13 +39,8 @@ class TurmasFragment : Fragment() {
     private fun setup() {
         setupViews()
         setupClickListeners()
-        observeColecaoTurmas()
         setupRecyclerView()
         setupObservers()
-    }
-
-    private fun observeColecaoTurmas() {
-        viewModel.observeColecaoTurmas()
     }
 
     private fun setupClickListeners() {
