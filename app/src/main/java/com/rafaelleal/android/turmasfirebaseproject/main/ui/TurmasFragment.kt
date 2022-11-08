@@ -39,9 +39,13 @@ class TurmasFragment : Fragment() {
     private fun setup() {
         setupViews()
         setupClickListeners()
-        getTurmas()
+        observeColecaoTurmas()
         setupRecyclerView()
         setupObservers()
+    }
+
+    private fun observeColecaoTurmas() {
+        viewModel.observeColecaoTurmas()
     }
 
     private fun setupClickListeners() {
@@ -61,9 +65,9 @@ class TurmasFragment : Fragment() {
 
 
     // Existe maneira melhor!!!
-    fun getTurmas() {
-        viewModel.getTurmas()
-    }
+//    fun getTurmas() {
+//        viewModel.getTurmas()
+//    }
 
 
     val adapter = TurmaAdapter(

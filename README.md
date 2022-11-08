@@ -1,2 +1,2 @@
 # TurmasFirebaseProject
-Projeto do com Firebase
+Projeto com Firebase

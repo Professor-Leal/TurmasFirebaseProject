@@ -91,6 +91,10 @@ class TurmasRepository private constructor() {
         return colecaoTurmas.get()
     }
 
+    fun getTurmasColecao(): CollectionReference {
+        return colecaoTurmas
+    }
+
 
 
 }

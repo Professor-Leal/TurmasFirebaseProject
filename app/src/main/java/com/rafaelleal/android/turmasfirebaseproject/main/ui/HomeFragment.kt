@@ -28,7 +28,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setup() {
+        setupViews()
         setupClickListeners()
+    }
+
+    private fun setupViews() {
+        activity?.setTitle("Home")
     }
 
     private fun setupClickListeners() {
