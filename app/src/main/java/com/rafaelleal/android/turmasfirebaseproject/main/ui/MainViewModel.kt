@@ -24,7 +24,6 @@ class MainViewModel : ViewModel() {
         return repository.getCurrentUser()?.email ?: "Email não encontrado"
     }
 
-
     fun logout() {
         repository.logout()
     }
@@ -54,6 +53,8 @@ class MainViewModel : ViewModel() {
         return lista
     }
 
+    // Ouvir vários documentos em uma coleção
+    // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#listen_to_multiple_documents_in_a_collection
     fun observeColecaoTurmas() {
 
         repository.getTurmasColecao()
@@ -63,35 +64,117 @@ class MainViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
+                val listaInput = mutableListOf<TurmaComId>()
 
+                val listaRemocao = mutableListOf<String>()
 
-                val listaInput = mutableListOf<Turma>()
+                val listaModificacao = mutableListOf<TurmaComId>()
 
                 for (dc in snapshots!!.documentChanges) {
                     when (dc.type) {
+
+                        // Documento adicionado
                         DocumentChange.Type.ADDED -> {
 
                             val turma = dc.document.toObject<Turma>()
                             val id = dc.document.id
                             val turmaComId = turmaToTurmaComId(turma, id)
 
-                            listaInput.add(dc.document.toObject())
-                            Log.d(TAG, "New city: ${dc.document.data}")
+                            Log.i(TAG, "turmaComId: ${turmaComId}")
+                            listaInput.add(turmaComId)
+
                         }
-                        DocumentChange.Type.MODIFIED -> Log.d(
-                            TAG,
-                            "Modified city: ${dc.document.id}"
-                        )
-                        DocumentChange.Type.REMOVED -> Log.d(
-                            TAG,
-                            "Removed city: ${dc.document.data}"
-                        )
+                        // Documento modificado
+                        DocumentChange.Type.MODIFIED -> {
+                            val turma = dc.document.toObject<Turma>()
+                            val id = dc.document.id
+                            val turmaComId = turmaToTurmaComId(turma, id)
+
+                            Log.i(TAG, "Modificacao - turmaComId: ${turmaComId}")
+                            listaModificacao.add(turmaComId)
+                        }
+
+                        DocumentChange.Type.REMOVED -> {
+                            val id = dc.document.id
+                            Log.i(TAG, "id removido: ${id}")
+                            listaRemocao.add(dc.document.id)
+
+                        }
                     }
                 }
-                addListaToTurmas(listaInput)
-
+                addListaToTurmasComId(listaInput)
+                removeFromTurmasComId(listaRemocao)
+                modifyInTurmasComId(listaModificacao)
 
             }
+    }
+
+    fun modifyItemInListaTurmasComId(itemModificado: TurmaComId) {
+        val listaAntiga = turmasComId.value
+        val listaNova = mutableListOf<TurmaComId>()
+
+        listaAntiga?.forEach { itemDaLista ->
+            if (itemModificado.id == itemDaLista.id) {
+                listaNova.add(itemModificado)
+            } else {
+                listaNova.add(itemDaLista)
+            }
+        }
+        setTurmasComId(listaNova)
+    }
+
+    private fun modifyInTurmasComId(listaModificacao: List<TurmaComId>) {
+        Log.i(TAG, "listaModificacao: ${listaModificacao}")
+        if (listaModificacao.isNotEmpty()) {
+            for (itemModificado in listaModificacao) {
+                modifyItemInListaTurmasComId(itemModificado)
+            }
+        }
+    }
+
+    private fun removeFromTurmasComId(listaRemocao: List<String>) {
+
+        val listaAntiga = turmasComId.value
+
+        val listaNova = mutableListOf<TurmaComId>()
+
+        Log.i(TAG, "listaRemocao: ${listaRemocao}")
+
+        if (listaRemocao.isNotEmpty()) {
+            listaAntiga?.forEach {
+                Log.i(TAG, "item da lista Antiga: ${it.id}")
+                if (it.id in listaRemocao) {
+                    Log.i(TAG, "item ${it.id} está dentro da listaRemocao")
+
+                    //listaNova.add(it)
+                } else {
+                    Log.i(TAG, "item ${it.id} _NÃO_ está dentro da listaRemocao")
+
+                    listaNova.add(it)
+                }
+            }
+            setTurmasComId(listaNova)
+        }
+
+
+    }
+
+    fun addListaToTurmasComId(listaInput: List<TurmaComId>) {
+        val listaAntiga = turmasComId.value
+
+        val listaNova = mutableListOf<TurmaComId>()
+
+        listaAntiga?.forEach {
+            listaNova.add(it)
+        }
+
+        listaInput.forEach {
+            listaNova.add(it)
+        }
+
+        setTurmasComId(listaNova)
+
+
     }
 
     fun addListaToTurmas(listaInput: List<Turma>) {
@@ -133,7 +216,7 @@ class MainViewModel : ViewModel() {
         _turmasComId.postValue(value)
     }
 
-    fun turmaToTurmaComId(turma: Turma, id: String) : TurmaComId{
+    fun turmaToTurmaComId(turma: Turma, id: String): TurmaComId {
         return TurmaComId(
             nomeProfessor = turma.nomeProfessor,
             nomeTurma = turma.nomeTurma,
@@ -142,7 +225,21 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    init{
+    fun deleteTurma(id: String) {
+        repository.deleteTurma(id)
+    }
+
+    private val _selectedTurmaComId = MutableLiveData<TurmaComId>()
+    val selectedTurmaComId: LiveData<TurmaComId> = _selectedTurmaComId
+    fun setSelectedTurmaComId(value: TurmaComId) {
+        _selectedTurmaComId.postValue(value)
+    }
+
+    fun atualizaTurma(turma: Turma) {
+        repository.atualizaTurma(selectedTurmaComId.value?.id, turma)
+    }
+
+    init {
         observeColecaoTurmas()
     }
 

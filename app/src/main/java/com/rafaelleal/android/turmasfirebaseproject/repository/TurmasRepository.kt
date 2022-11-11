@@ -95,6 +95,15 @@ class TurmasRepository private constructor() {
         return colecaoTurmas
     }
 
+    fun deleteTurma(id: String) {
+        colecaoTurmas.document(id).delete()
+    }
+
+    fun atualizaTurma(id: String?, turma: Turma) {
+        if (id != null){
+            colecaoTurmas.document(id).set(turma)
+        }
+    }
 
 
 }

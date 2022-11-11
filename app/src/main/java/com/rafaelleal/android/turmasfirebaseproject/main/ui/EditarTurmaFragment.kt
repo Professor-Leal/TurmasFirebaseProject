@@ -5,10 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.rafaelleal.android.turmasfirebaseproject.R
 import com.rafaelleal.android.turmasfirebaseproject.databinding.FragmentEditarTurmaBinding
+import com.rafaelleal.android.turmasfirebaseproject.models.Turma
+import com.rafaelleal.android.turmasfirebaseproject.utils.navUp
 
 class EditarTurmaFragment : Fragment() {
+
+    val viewModel: MainViewModel by activityViewModels()
+
     private var _binding: FragmentEditarTurmaBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -21,7 +28,53 @@ class EditarTurmaFragment : Fragment() {
     ): View? {
         _binding = FragmentEditarTurmaBinding.inflate(inflater, container, false)
         val view = binding.root
+        setup()
+
         return view
+    }
+
+    private fun setup() {
+        setupViews()
+        setupObservers()
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
+        binding.btnAtualizar.setOnClickListener {
+            onAtualizarClick()
+        }
+    }
+
+    private fun onAtualizarClick() {
+        val turma = getTurmaFromInputs()
+        viewModel.atualizaTurma(turma)
+        navUp()
+    }
+
+    private fun getTurmaFromInputs(): Turma {
+
+        binding.apply {
+            return Turma(
+                nomeTurma = inputNomeTurma.text.toString(),
+                nomeProfessor = inputNomeProfessor.text.toString(),
+                horario = inputHorario.text.toString()
+            )
+        }
+
+    }
+
+    private fun setupObservers() {
+        viewModel.selectedTurmaComId.observe(viewLifecycleOwner){
+            binding.apply {
+                inputNomeTurma.setText(it.nomeTurma)
+                inputNomeProfessor.setText(it.nomeProfessor)
+                inputHorario.setText(it.horario)
+            }
+        }
+    }
+
+    private fun setupViews() {
+        activity?.setTitle("Editar")
     }
 
     override fun onDestroyView() {

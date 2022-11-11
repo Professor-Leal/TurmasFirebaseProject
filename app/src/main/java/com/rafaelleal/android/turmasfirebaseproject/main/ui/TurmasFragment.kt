@@ -10,8 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.rafaelleal.android.turmasfirebaseproject.R
 import com.rafaelleal.android.turmasfirebaseproject.databinding.FragmentTurmasBinding
 import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaAdapter
+import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaComIdAdapter
+import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaComIdListener
 import com.rafaelleal.android.turmasfirebaseproject.main.ui.adapters.TurmaListener
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
+import com.rafaelleal.android.turmasfirebaseproject.models.TurmaComId
 import com.rafaelleal.android.turmasfirebaseproject.utils.nav
 import com.rafaelleal.android.turmasfirebaseproject.utils.toast
 
@@ -65,13 +68,15 @@ class TurmasFragment : Fragment() {
 //    }
 
 
-    val adapter = TurmaAdapter(
-        object : TurmaListener {
-            override fun onEditClick(turma: Turma) {
+    val adapter = TurmaComIdAdapter(
+        object : TurmaComIdListener {
+            override fun onEditClick(turma: TurmaComId) {
+                viewModel.setSelectedTurmaComId(turma)
                 nav(R.id.action_turmasFragment_to_editarTurmaFragment)
             }
 
-            override fun onDeleteClick(turma: Turma) {
+            override fun onDeleteClick(turma: TurmaComId) {
+                viewModel.deleteTurma(turma.id)
             }
         }
     )
@@ -87,12 +92,12 @@ class TurmasFragment : Fragment() {
     }
 
     private fun setupObservers(){
-        viewModel.turmas.observe(viewLifecycleOwner){
+        viewModel.turmasComId.observe(viewLifecycleOwner){
             atualizaRecyclerView(it)
         }
     }
 
-    fun atualizaRecyclerView(lista: List<Turma>){
+    fun atualizaRecyclerView(lista: List<TurmaComId>){
         adapter.submitList(lista)
         binding.rvTurmas.adapter = adapter
     }
