@@ -9,6 +9,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.toObject
+import com.rafaelleal.android.turmasfirebaseproject.models.Aluno
+import com.rafaelleal.android.turmasfirebaseproject.models.AlunoComId
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 import com.rafaelleal.android.turmasfirebaseproject.models.TurmaComId
 import com.rafaelleal.android.turmasfirebaseproject.repository.TurmasRepository
@@ -18,7 +20,6 @@ class MainViewModel : ViewModel() {
 
     val TAG = "ViewModel"
     val repository = TurmasRepository.get()
-
 
     fun getCurrentUserEmail(): String {
         return repository.getCurrentUser()?.email ?: "Email não encontrado"
@@ -30,27 +31,6 @@ class MainViewModel : ViewModel() {
 
     fun cadastrarTurma(turma: Turma): Task<DocumentReference> {
         return repository.cadastrarTurma(turma)
-    }
-
-    fun getTurmas(): List<Turma> {
-
-        val lista = mutableListOf<Turma>()
-
-        repository.getTurmas()
-
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val turma = document.toObject<Turma>()
-                    lista.add(turma)
-                    Log.i(TAG, "document: ${document}")
-                    Log.i(TAG, "turma: ${turma}")
-                }
-                setTurmas(lista)
-            }
-            .addOnFailureListener { exception ->
-
-            }
-        return lista
     }
 
     // Ouvir vários documentos em uma coleção
@@ -70,6 +50,9 @@ class MainViewModel : ViewModel() {
 
                 val listaModificacao = mutableListOf<TurmaComId>()
 
+
+                // Ver alterações entre instantâneos
+                // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#view_changes_between_snapshots
                 for (dc in snapshots!!.documentChanges) {
                     when (dc.type) {
 
@@ -84,6 +67,7 @@ class MainViewModel : ViewModel() {
                             listaInput.add(turmaComId)
 
                         }
+
                         // Documento modificado
                         DocumentChange.Type.MODIFIED -> {
                             val turma = dc.document.toObject<Turma>()
@@ -94,6 +78,7 @@ class MainViewModel : ViewModel() {
                             listaModificacao.add(turmaComId)
                         }
 
+                        // Documento removido
                         DocumentChange.Type.REMOVED -> {
                             val id = dc.document.id
                             Log.i(TAG, "id removido: ${id}")
@@ -102,10 +87,10 @@ class MainViewModel : ViewModel() {
                         }
                     }
                 }
+
                 addListaToTurmasComId(listaInput)
                 removeFromTurmasComId(listaRemocao)
                 modifyInTurmasComId(listaModificacao)
-
             }
     }
 
@@ -177,6 +162,30 @@ class MainViewModel : ViewModel() {
 
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Esses métodos não estão sendo usados porque fazem um novo download //////////////////////////
+    // a cada vez que são chamados /////////////////////////////////////////////////////////////////
+
+    fun getTurmas(): List<Turma> {
+
+        val lista = mutableListOf<Turma>()
+        repository.getTurmas()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val turma = document.toObject<Turma>()
+                    lista.add(turma)
+                    Log.i(TAG, "document: ${document}")
+                    Log.i(TAG, "turma: ${turma}")
+                }
+                setTurmas(lista)
+            }
+            .addOnFailureListener { exception ->
+
+            }
+        return lista
+    }
+
     fun addListaToTurmas(listaInput: List<Turma>) {
         val listaAntiga = turmas.value
         val listaNova = mutableListOf<Turma>()
@@ -203,6 +212,9 @@ class MainViewModel : ViewModel() {
         setTurmas(listaNova)
 
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private val _turmas = MutableLiveData<List<Turma>>()
     val turmas: LiveData<List<Turma>> = _turmas
@@ -239,8 +251,116 @@ class MainViewModel : ViewModel() {
         repository.atualizaTurma(selectedTurmaComId.value?.id, turma)
     }
 
+
+    // Alunos
+    private val _alunosComId = MutableLiveData<List<AlunoComId>>()
+    val alunosComId: LiveData<List<AlunoComId>> = _alunosComId
+    fun setAlunosComId(value: List<AlunoComId>) {
+        Log.i(TAG, "setAlunosComId" )
+        Log.i(TAG, "value = ${value}" )
+        _alunosComId.postValue(value)
+    }
+
+    // Ouvir vários documentos em uma coleção
+    // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#listen_to_multiple_documents_in_a_collection
+    fun observeColecaoAlunos() {
+
+        repository.getAlunosColecao()
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.w(TAG, "listen:error", e)
+                    return@addSnapshotListener
+                }
+
+                val listaInput = mutableListOf<AlunoComId>()
+
+                val listaRemocao = mutableListOf<String>()
+
+                val listaModificacao = mutableListOf<AlunoComId>()
+
+
+                // Ver alterações entre instantâneos
+                // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#view_changes_between_snapshots
+                for (dc in snapshots!!.documentChanges) {
+                    when (dc.type) {
+
+                        // Documento adicionado
+                        DocumentChange.Type.ADDED -> {
+
+                            val aluno = dc.document.toObject<Aluno>()
+                            val id = dc.document.id
+                            val alunoComId = alunoToAlunoComId(aluno, id)
+
+                            Log.i(TAG, "alunoComId: ${alunoComId}")
+                            listaInput.add(alunoComId)
+
+                        }
+
+                        // Documento modificado
+                        DocumentChange.Type.MODIFIED -> {
+//                            val turma = dc.document.toObject<Turma>()
+//                            val id = dc.document.id
+//                            val turmaComId = turmaToTurmaComId(turma, id)
+//
+//                            Log.i(TAG, "Modificacao - turmaComId: ${turmaComId}")
+//                            listaModificacao.add(turmaComId)
+                        }
+
+                        // Documento removido
+                        DocumentChange.Type.REMOVED -> {
+//                            val id = dc.document.id
+//                            Log.i(TAG, "id removido: ${id}")
+//                            listaRemocao.add(dc.document.id)
+
+                        }
+                    }
+                }
+
+                addListaToAlunosComId(listaInput)
+//                removeFromTurmasComId(listaRemocao)
+//                modifyInTurmasComId(listaModificacao)
+            }
+    }
+
+    private fun alunoToAlunoComId(aluno: Aluno, id: String): AlunoComId {
+        return AlunoComId(
+            nomeAluno = aluno.nomeAluno,
+            matricula = aluno.matricula,
+            idade = aluno.idade,
+            id=id
+        )
+
+    }
+
+    fun addListaToAlunosComId(listaInput: List<AlunoComId>) {
+
+
+        val listaAntiga = alunosComId.value
+
+        val listaNova = mutableListOf<AlunoComId>()
+
+        listaAntiga?.forEach {
+            listaNova.add(it)
+        }
+
+        listaInput.forEach {
+            listaNova.add(it)
+        }
+
+        setAlunosComId(listaNova)
+    }
+
+
+
+    fun cadastrarAluno(aluno: Aluno): Task<DocumentReference> {
+        return repository.cadastrarAluno(aluno)
+    }
+
+
+
     init {
         observeColecaoTurmas()
+        observeColecaoAlunos()
     }
 
 

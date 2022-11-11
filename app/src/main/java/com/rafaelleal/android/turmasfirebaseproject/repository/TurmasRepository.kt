@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.rafaelleal.android.turmasfirebaseproject.models.Aluno
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 
 
@@ -27,7 +28,9 @@ class TurmasRepository private constructor() {
 
         lateinit var db: FirebaseFirestore
 
-        lateinit var colecaoTurmas : CollectionReference
+        lateinit var colecaoTurmas: CollectionReference
+
+        lateinit var colecaoAlunos: CollectionReference
 
         private var INSTANCE: TurmasRepository? = null
         fun initialize() {
@@ -40,6 +43,9 @@ class TurmasRepository private constructor() {
 
             // Coleção de turmas:
             colecaoTurmas = db.collection("turmas")
+
+            // Coleção de alunos:
+            colecaoAlunos = db.collection("alunos")
 
 
         }
@@ -56,7 +62,7 @@ class TurmasRepository private constructor() {
 
     fun isLoggedIn(): Boolean {
 
-        if(getCurrentUser() != null) {
+        if (getCurrentUser() != null) {
             return true
         }
         return false
@@ -66,28 +72,29 @@ class TurmasRepository private constructor() {
     fun cadastrarUsuarioComSenha(
         email: String,
         password: String
-    ) : Task<AuthResult> {
+    ): Task<AuthResult> {
         return auth.createUserWithEmailAndPassword(email, password)
     }
 
     fun login(
         email: String,
         password: String
-    ) : Task<AuthResult> {
+    ): Task<AuthResult> {
         return auth.signInWithEmailAndPassword(email, password)
     }
 
-    fun logout(){
+    fun logout() {
         auth.signOut()
     }
 
     // FireStore ///////////////////////////////////////////////////////////////////////////////////
 
-    fun cadastrarTurma( turma: Turma): Task<DocumentReference> {
-        return  colecaoTurmas.add(turma)
+    // Turmas
+    fun cadastrarTurma(turma: Turma): Task<DocumentReference> {
+        return colecaoTurmas.add(turma)
     }
 
-    fun getTurmas() : Task<QuerySnapshot> {
+    fun getTurmas(): Task<QuerySnapshot> {
         return colecaoTurmas.get()
     }
 
@@ -100,9 +107,19 @@ class TurmasRepository private constructor() {
     }
 
     fun atualizaTurma(id: String?, turma: Turma) {
-        if (id != null){
+        if (id != null) {
             colecaoTurmas.document(id).set(turma)
         }
+    }
+
+    // Alunos
+
+    fun getAlunosColecao(): CollectionReference {
+        return colecaoAlunos
+    }
+
+    fun cadastrarAluno(aluno: Aluno): Task<DocumentReference> {
+        return colecaoAlunos.add(aluno)
     }
 
 

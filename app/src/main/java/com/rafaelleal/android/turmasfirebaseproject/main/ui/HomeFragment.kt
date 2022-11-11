@@ -37,8 +37,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.btnTurmas.setOnClickListener {
-            nav(R.id.action_homeFragment_to_turmasFragment)
+        binding.apply {
+            btnTurmas.setOnClickListener {
+                nav(R.id.action_homeFragment_to_turmasFragment)
+            }
+
+            btnAlunos.setOnClickListener {
+                nav(R.id.action_homeFragment_to_alunosFragment)
+            }
         }
     }
 

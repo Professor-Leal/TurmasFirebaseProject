@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.rafaelleal.android.turmasfirebaseproject.R
 import com.rafaelleal.android.turmasfirebaseproject.databinding.FragmentEditarTurmaBinding
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
+import com.rafaelleal.android.turmasfirebaseproject.utils.getTextInput
 import com.rafaelleal.android.turmasfirebaseproject.utils.navUp
 
 class EditarTurmaFragment : Fragment() {
@@ -52,15 +53,13 @@ class EditarTurmaFragment : Fragment() {
     }
 
     private fun getTurmaFromInputs(): Turma {
-
         binding.apply {
             return Turma(
-                nomeTurma = inputNomeTurma.text.toString(),
-                nomeProfessor = inputNomeProfessor.text.toString(),
-                horario = inputHorario.text.toString()
+                nomeTurma = getTextInput(inputNomeTurma),
+                nomeProfessor = getTextInput(inputNomeProfessor),
+                horario = getTextInput(inputHorario)
             )
         }
-
     }
 
     private fun setupObservers() {

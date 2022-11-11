@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_turmasFragment"
             app:destination="@id/turmasFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_alunosFragment"
+            app:destination="@id/alunosFragment" />
     </fragment>
     <fragment
         android:id="@+id/turmasFragment"
@@ -36,4 +39,18 @@
         android:name="com.rafaelleal.android.turmasfirebaseproject.main.ui.EditarTurmaFragment"
         android:label="fragment_editar_turma"
         tools:layout="@layout/fragment_editar_turma" />
+    <fragment
+        android:id="@+id/alunosFragment"
+        android:name="com.rafaelleal.android.turmasfirebaseproject.main.ui.AlunosFragment"
+        android:label="AlunosFragment"
+        tools:layout="@layout/fragment_alunos" >
+        <action
+            android:id="@+id/action_alunosFragment_to_cadastrarAlunoFragment"
+            app:destination="@id/cadastrarAlunoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cadastrarAlunoFragment"
+        android:name="com.rafaelleal.android.Alunosfirebaseproject.main.ui.CadastrarAlunoFragment"
+        android:label="CadastrarAlunoFragment"
+        tools:layout="@layout/fragment_cadastrar_aluno" />
 </navigation>

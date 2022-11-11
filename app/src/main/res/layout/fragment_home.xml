@@ -6,19 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".main.ui.HomeFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/btn_turmas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Turmas"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="Turmas" />
+
+        <Button
+            android:id="@+id/btn_alunos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alunos" />
+    </LinearLayout>
 
 
 

@@ -63,9 +63,9 @@ class TurmasFragment : Fragment() {
 
 
     // Existe maneira melhor!!!
-//    fun getTurmas() {
-//        viewModel.getTurmas()
-//    }
+    //    fun getTurmas() {
+    //        viewModel.getTurmas()
+    //    }
 
 
     val adapter = TurmaComIdAdapter(
@@ -91,13 +91,13 @@ class TurmasFragment : Fragment() {
         )
     }
 
-    private fun setupObservers(){
-        viewModel.turmasComId.observe(viewLifecycleOwner){
+    private fun setupObservers() {
+        viewModel.turmasComId.observe(viewLifecycleOwner) {
             atualizaRecyclerView(it)
         }
     }
 
-    fun atualizaRecyclerView(lista: List<TurmaComId>){
+    fun atualizaRecyclerView(lista: List<TurmaComId>) {
         adapter.submitList(lista)
         binding.rvTurmas.adapter = adapter
     }

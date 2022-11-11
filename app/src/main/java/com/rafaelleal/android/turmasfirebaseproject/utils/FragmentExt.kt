@@ -17,6 +17,11 @@ fun Fragment.navUp(){
     return editText.text.toString()
 }
 
+
+fun Fragment.getIntInput(editText: EditText): Int {
+    return editText.text.toString().toInt()
+}
+
 fun Fragment.toast(msg: String){
     Toast.makeText(
         requireContext(),
