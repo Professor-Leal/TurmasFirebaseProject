@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rafaelleal.android.turmasfirebaseproject.models.Aluno
+import com.rafaelleal.android.turmasfirebaseproject.models.AlunoComId
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 
 
@@ -120,6 +121,16 @@ class TurmasRepository private constructor() {
 
     fun cadastrarAluno(aluno: Aluno): Task<DocumentReference> {
         return colecaoAlunos.add(aluno)
+    }
+
+    fun deleteAluno(id: String): Task<Void> {
+        return colecaoAlunos.document(id).delete()
+    }
+
+   fun atualizaAluno(id: String?, aluno: Aluno) {
+        if (id != null) {
+            colecaoAlunos.document(id).set(aluno)
+        }
     }
 
 

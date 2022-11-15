@@ -17,7 +17,6 @@ import com.rafaelleal.android.turmasfirebaseproject.repository.TurmasRepository
 
 class MainViewModel : ViewModel() {
 
-
     val TAG = "ViewModel"
     val repository = TurmasRepository.get()
 
@@ -49,7 +48,6 @@ class MainViewModel : ViewModel() {
                 val listaRemocao = mutableListOf<String>()
 
                 val listaModificacao = mutableListOf<TurmaComId>()
-
 
                 // Ver alterações entre instantâneos
                 // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#view_changes_between_snapshots
@@ -168,7 +166,6 @@ class MainViewModel : ViewModel() {
     // a cada vez que são chamados /////////////////////////////////////////////////////////////////
 
     fun getTurmas(): List<Turma> {
-
         val lista = mutableListOf<Turma>()
         repository.getTurmas()
             .addOnSuccessListener { documents ->
@@ -210,12 +207,14 @@ class MainViewModel : ViewModel() {
         }
         listaNova.add(turma)
         setTurmas(listaNova)
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Turmas //////////////////////////////////////////////////////////////////////////////////////
     private val _turmas = MutableLiveData<List<Turma>>()
     val turmas: LiveData<List<Turma>> = _turmas
     fun setTurmas(value: List<Turma>) {
@@ -251,8 +250,11 @@ class MainViewModel : ViewModel() {
         repository.atualizaTurma(selectedTurmaComId.value?.id, turma)
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Alunos
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Alunos //////////////////////////////////////////////////////////////////////////////////////
     private val _alunosComId = MutableLiveData<List<AlunoComId>>()
     val alunosComId: LiveData<List<AlunoComId>> = _alunosComId
     fun setAlunosComId(value: List<AlunoComId>) {
@@ -278,7 +280,6 @@ class MainViewModel : ViewModel() {
 
                 val listaModificacao = mutableListOf<AlunoComId>()
 
-
                 // Ver alterações entre instantâneos
                 // https://firebase.google.com/docs/firestore/query-data/listen?hl=pt&authuser=0#view_changes_between_snapshots
                 for (dc in snapshots!!.documentChanges) {
@@ -298,27 +299,27 @@ class MainViewModel : ViewModel() {
 
                         // Documento modificado
                         DocumentChange.Type.MODIFIED -> {
-//                            val turma = dc.document.toObject<Turma>()
-//                            val id = dc.document.id
-//                            val turmaComId = turmaToTurmaComId(turma, id)
-//
-//                            Log.i(TAG, "Modificacao - turmaComId: ${turmaComId}")
-//                            listaModificacao.add(turmaComId)
+                            val aluno = dc.document.toObject<Aluno>()
+                            val id = dc.document.id
+                            val alunoComId = alunoToAlunoComId(aluno, id)
+
+                            Log.i(TAG, "Modificacao - turmaComId: ${alunoComId}")
+                            listaModificacao.add(alunoComId)
                         }
 
                         // Documento removido
                         DocumentChange.Type.REMOVED -> {
-//                            val id = dc.document.id
+                            val id = dc.document.id
 //                            Log.i(TAG, "id removido: ${id}")
-//                            listaRemocao.add(dc.document.id)
+                            listaRemocao.add(dc.document.id)
 
                         }
                     }
                 }
 
                 addListaToAlunosComId(listaInput)
-//                removeFromTurmasComId(listaRemocao)
-//                modifyInTurmasComId(listaModificacao)
+                removeFromAlunosComId(listaRemocao)
+                modifyInAlunosComId(listaModificacao)
             }
     }
 
@@ -329,11 +330,9 @@ class MainViewModel : ViewModel() {
             idade = aluno.idade,
             id=id
         )
-
     }
 
     fun addListaToAlunosComId(listaInput: List<AlunoComId>) {
-
 
         val listaAntiga = alunosComId.value
 
@@ -350,13 +349,74 @@ class MainViewModel : ViewModel() {
         setAlunosComId(listaNova)
     }
 
+    fun modifyItemInListaAlunosComId(itemModificado: AlunoComId) {
+        val listaAntiga = alunosComId.value
+        val listaNova = mutableListOf<AlunoComId>()
 
+        listaAntiga?.forEach { itemDaLista ->
+            if (itemModificado.id == itemDaLista.id) {
+                listaNova.add(itemModificado)
+            } else {
+                listaNova.add(itemDaLista)
+            }
+        }
+        setAlunosComId(listaNova)
+    }
+
+    private fun modifyInAlunosComId(listaModificacao: List<AlunoComId>) {
+        Log.i(TAG, "listaModificacao: ${listaModificacao}")
+        if (listaModificacao.isNotEmpty()) {
+            for (itemModificado in listaModificacao) {
+                modifyItemInListaAlunosComId(itemModificado)
+            }
+        }
+    }
+
+    private fun removeFromAlunosComId(listaRemocao: List<String>) {
+
+        val listaAntiga = alunosComId.value
+
+        val listaNova = mutableListOf<AlunoComId>()
+
+        Log.i(TAG, "listaRemocao: ${listaRemocao}")
+
+        if (listaRemocao.isNotEmpty()) {
+            listaAntiga?.forEach {
+                Log.i(TAG, "item da lista Antiga: ${it.id}")
+                if (it.id in listaRemocao) {
+                    Log.i(TAG, "item ${it.id} está dentro da listaRemocao")
+
+                    //listaNova.add(it)
+                } else {
+                    Log.i(TAG, "item ${it.id} _NÃO_ está dentro da listaRemocao")
+                    listaNova.add(it)
+                }
+            }
+            setAlunosComId(listaNova)
+        }
+
+
+    }
 
     fun cadastrarAluno(aluno: Aluno): Task<DocumentReference> {
         return repository.cadastrarAluno(aluno)
     }
 
+    private val _selectedAlunoComId = MutableLiveData<AlunoComId>()
+    val selectedAlunoComId: LiveData<AlunoComId> = _selectedAlunoComId
+    fun setSelectedAlunoComId(value: AlunoComId) {
+        _selectedAlunoComId.postValue(value)
+    }
 
+    fun atualizaAluno(aluno: Aluno) {
+        repository.atualizaAluno(selectedAlunoComId.value?.id, aluno)
+    }
+
+    fun deleteAluno(alunoComId: AlunoComId): Task<Void> {
+        return repository.deleteAluno(alunoComId.id)
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     init {
         observeColecaoTurmas()

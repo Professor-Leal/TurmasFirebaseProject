@@ -47,10 +47,18 @@
         <action
             android:id="@+id/action_alunosFragment_to_cadastrarAlunoFragment"
             app:destination="@id/cadastrarAlunoFragment" />
+        <action
+            android:id="@+id/action_alunosFragment_to_editarAlunoFragment"
+            app:destination="@id/editarAlunoFragment" />
     </fragment>
     <fragment
         android:id="@+id/cadastrarAlunoFragment"
         android:name="com.rafaelleal.android.Alunosfirebaseproject.main.ui.CadastrarAlunoFragment"
         android:label="CadastrarAlunoFragment"
         tools:layout="@layout/fragment_cadastrar_aluno" />
+    <fragment
+        android:id="@+id/editarAlunoFragment"
+        android:name="com.rafaelleal.android.turmasfirebaseproject.main.ui.EditarAlunoFragment"
+        android:label="fragment_editar_aluno"
+        tools:layout="@layout/fragment_editar_aluno" />
 </navigation>

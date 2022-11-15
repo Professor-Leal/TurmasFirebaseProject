@@ -41,12 +41,12 @@ class AlunosFragment : Fragment() {
     val adapter = AlunoComIdAdapter(
         object : AlunoComIdListener {
             override fun onEditClick(aluno: AlunoComId) {
-//                viewModel.setSelectedAlunoComId(turma)
-//                nav(R.id.action_AlunosFragment_to_editarTurmaFragment)
+                viewModel.setSelectedAlunoComId(aluno)
+                nav(R.id.action_alunosFragment_to_editarAlunoFragment)
             }
 
             override fun onDeleteClick(aluno: AlunoComId) {
-//                viewModel.deleteAluno(aluno.id)
+                viewModel.deleteAluno(aluno)
             }
         }
     )
