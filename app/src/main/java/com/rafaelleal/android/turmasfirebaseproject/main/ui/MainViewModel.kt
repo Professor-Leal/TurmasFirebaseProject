@@ -415,6 +415,15 @@ class MainViewModel : ViewModel() {
     fun deleteAluno(alunoComId: AlunoComId): Task<Void> {
         return repository.deleteAluno(alunoComId.id)
     }
+
+
+    fun inscreverAlunoNaTurma(alunoComId: AlunoComId){
+        repository.inscreverAlunoNaTurma(
+            selectedTurmaComId.value?.id!!,
+            alunoComId
+        )
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

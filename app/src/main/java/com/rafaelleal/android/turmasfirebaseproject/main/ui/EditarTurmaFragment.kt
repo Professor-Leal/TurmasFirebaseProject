@@ -11,6 +11,7 @@ import com.rafaelleal.android.turmasfirebaseproject.R
 import com.rafaelleal.android.turmasfirebaseproject.databinding.FragmentEditarTurmaBinding
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 import com.rafaelleal.android.turmasfirebaseproject.utils.getTextInput
+import com.rafaelleal.android.turmasfirebaseproject.utils.nav
 import com.rafaelleal.android.turmasfirebaseproject.utils.navUp
 
 class EditarTurmaFragment : Fragment() {
@@ -41,9 +42,21 @@ class EditarTurmaFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.btnAtualizar.setOnClickListener {
-            onAtualizarClick()
+        binding.apply{
+            btnAtualizar.setOnClickListener {
+                onAtualizarClick()
+            }
+
+            btnInscreverAlunos.setOnClickListener {
+                onIncreverAlunosClick()
+            }
         }
+
+
+    }
+
+    private fun onIncreverAlunosClick() {
+        nav(R.id.action_editarTurmaFragment_to_inscreverAlunosFragment)
     }
 
     private fun onAtualizarClick() {

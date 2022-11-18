@@ -76,6 +76,14 @@
             android:layout_marginTop="48dp"
             android:text="Atualizar" />
 
+      <Button
+            android:id="@+id/btn_inscrever_alunos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="48dp"
+            android:text="Increver Alunos" />
+
 
     </LinearLayout>
 

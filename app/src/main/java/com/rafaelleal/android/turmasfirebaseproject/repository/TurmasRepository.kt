@@ -12,6 +12,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rafaelleal.android.turmasfirebaseproject.models.Aluno
 import com.rafaelleal.android.turmasfirebaseproject.models.AlunoComId
+import com.rafaelleal.android.turmasfirebaseproject.models.AlunoNaTurma
 import com.rafaelleal.android.turmasfirebaseproject.models.Turma
 
 
@@ -131,6 +132,18 @@ class TurmasRepository private constructor() {
         if (id != null) {
             colecaoAlunos.document(id).set(aluno)
         }
+    }
+
+    fun inscreverAlunoNaTurma(idTurma: String, alunoComId: AlunoComId){
+        val alunoNaTurma = AlunoNaTurma(
+            nomeAluno = alunoComId.nomeAluno,
+            matricula = alunoComId.matricula,
+        )
+        colecaoTurmas
+            .document(idTurma)
+            .collection("alunos")
+            .document(alunoComId.id)
+            .set(alunoNaTurma)
     }
 
 
